@@ -18,8 +18,9 @@
  *   - to-ecef <lat> <lon> <h>
  *   - to-geo <x> <y> <z>
  * 
- * Example:
- *   gnss-tool coord to-ecef 52.0 13.0 100
+ * Examples:
+ *   gnss-tool coord to-ecef 52.0 13.0 100.0
+ *   gnss-tool coord to-geo 3834167.673 885187.355 5002882.147
  */
 int cmd_coord(int argc, char *argv[]) {
 	if (argc < 2) {
