@@ -24,8 +24,7 @@ struct geodesic to_geo (struct cartesian *cartcoord);
 
 /* ---- Constants ---- */
 
-#define WGS84_A 6378137 // Semi-major Axis "a" in meters
-#define WGS84_F 298.257223563 // Flattening Factor (1/f)
-#define WGS84_B 6356752.3142 // Semi-minor axis "b" in meters
+#define WGS84_A 6378137.0 // Semi-major Axis "a" in meters
+#define WGS84_F 1.0/298.257223563 // Flattening Factor
 
 #endif
