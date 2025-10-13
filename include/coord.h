@@ -21,6 +21,8 @@ int cmd_coord(int argc, char *argv[]);
 void print_coord_usage();
 struct cartesian to_ecef (const struct geodesic *geocoord);
 struct geodesic to_geo (const struct cartesian *cartcoord);
+void print_geodesic_coord(const struct geodesic *geocoord);
+void print_cartesian_coord(const struct cartesian *carcoord);
 
 /* ---- Constants ---- */
 

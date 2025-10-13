@@ -4,6 +4,10 @@
 #include <math.h>
 #include "coord.h"
 
+/* ----------------------------------------------------
+ *  Command Line Interface and Display Functions
+ * --------------------------------------------------- */
+
 /**
  * 
  * cmd_coord - Command initiator for coord subcommand.
@@ -27,12 +31,14 @@ int cmd_coord(int argc, char *argv[]) {
 	// from geodetic to cartesian
 	if (!strcmp(argv[1],"to-ecef")) {
 		printf("[coord] Converting geodetic to ECEF...\n");
-		struct geocoord input_geo = {
-			.lat = argv[2],
-			.lon = argv[3],
-			.h = argv[4]
+
+		struct geodesic input_geo = {
+			.lat = atof(argv[2]),
+			.lon = atof(argv[3]),
+			.h = atof(argv[4])
 		};
 		struct cartesian result = to_ecef(&input_geo);
+		print_cartesian_coord(&result);
 	
 	// from cartesian to geodetic 
 	} else if (!strcmp(argv[1], "to-geo")) {
@@ -53,21 +59,38 @@ void print_coord_usage() {
 	printf("  help                          displays this help.\n");
 }
 
-/**/
-struct cartesian to_ecef(const struct geocoord *input_geo) {
-	// STEP 1: Convert geocoord to rad
-	double lat_rad = input_geo->lat * M_PI / 180.0;
-	double lon_rad = input_geo->lon * M_PI / 180.0;
-	double e_sq = (2 * WGS_F) - pow(WGS_F, 2);
+void print_geodesic_coord(const struct geodesic *geocoord) {
+	printf("[to_geo@coord] output: \n");
+	printf(" lat -> %f \n lon -> %f \n h -> %f \n", geocoord->lat, geocoord->lon, geocoord->h);
+}
+
+void print_cartesian_coord(const struct cartesian *carcoord) {
+	printf("[to_ecef@coord] output:\n");
+	printf(" x -> %f \n y -> %f \n z -> %f \n", carcoord->x, carcoord->y, carcoord->z);
+};
+
+/* ----------------------------------------------------
+ *  Geodesic Functions
+ * --------------------------------------------------- */
+
+/*
+ * 
+ * */
+struct cartesian to_ecef(const struct geodesic *geocoord) {
+	// Convert geocoord angles to rad
+	double lat_rad = geocoord->lat * M_PI / 180.0;
+	double lon_rad = geocoord->lon * M_PI / 180.0;
+	double e_sq = (2 * WGS84_F) - pow(WGS84_F, 2);
 	
-	// STEP 2: Compute the radius of the curvature
-	double N = WGS_A / sqrt(1.0 - (e_sq * pow(sin(lat_rad),2)));
+	// Compute the radius of the curvature
+	double N = WGS84_A / sqrt(1.0 - (e_sq * pow(sin(lat_rad),2)));
 
-	// STEP 3: Compute Cartesian coordinates
-	double x = (N + input_geo->h) * cos(lat_rad) * cos(lon_rad);
-	double y = (N + input_geo->h) * cos(lat_rad) * sin(lon_rad);
-	double z = (((1 - e_sq) * N) + input_geo->h) * sin(lat_rad);
+	// Compute Cartesian coordinates
+	double x = (N + geocoord->h) * cos(lat_rad) * cos(lon_rad);
+	double y = (N + geocoord->h) * cos(lat_rad) * sin(lon_rad);
+	double z = (((1 - e_sq) * N) + geocoord->h) * sin(lat_rad);
 
+        // Struct result
 	struct cartesian result = {
 		.x = x, 
 		.y = y, 
@@ -76,3 +99,10 @@ struct cartesian to_ecef(const struct geocoord *input_geo) {
 
 	return result;
 }
+
+
+/* ----------------------------------------------------
+ *  TODO: memory management functions
+ * --------------------------------------------------- */
+
+
