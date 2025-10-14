@@ -101,9 +101,7 @@ struct cartesian to_ecef(const struct geodesic *geocoord) {
 	return result;
 }
 
-
 /* ----------------------------------------------------
  *  TODO: memory management functions
  * --------------------------------------------------- */
-
 
