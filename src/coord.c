@@ -44,6 +44,14 @@ int cmd_coord(int argc, char *argv[]) {
 	// from cartesian to geodetic 
 	} else if (!strcmp(argv[1], "to-geo")) {
 		printf("[coord] Converting ECEF to geodetic...\n");
+
+		struct cartesian input_xyz = {
+			.x = atof(argv[2]),
+			.y = atof(argv[3]),
+			.z = atof(argv[4])
+		};
+		struct geodesic result = to_geo(&input_xyz);
+		print_geodesic_coord(&result);
 	} else {
 		fprintf(stderr, "Unkown command: %s\n", argv[1]);
 		print_coord_usage();
@@ -101,6 +109,31 @@ struct cartesian to_ecef(const struct geodesic *geocoord) {
 	return result;
 }
 
+
+struct geodesic to_geo(const struct cartesian *cartcoord) {
+	// longitude
+	double lon = atan(cartcoord->y/cartcoord->x);
+
+	// initial latitude
+	double p = sqrt(pow(cartcoord->x, 2) + pow(cartcoord->y, 2));
+	double e_sq = (2 * WGS84_F) - pow(WGS84_F, 2);
+	double lat = atan((cartcoord->z/p)/(1 - e_sq));
+	double h = cartcoord->z;
+	
+	// iteration to refine latitude (for loop against tolerance and max tries)
+	// (The iterations are repeated until the change between two successive
+        // values of φ(i) is smaller than the precision required.)
+
+	
+        struct geodesic result = {
+		.lat = lat,
+		.lon = lon,
+		.h = h
+	}
+        
+	// struct result
+	return result;
+}
 /* ----------------------------------------------------
  *  TODO: memory management functions
  * --------------------------------------------------- */
