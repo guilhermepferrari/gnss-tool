@@ -8,20 +8,6 @@
  *  Command Line Interface and Display Functions
  * --------------------------------------------------- */
 
-/**
- *
- * cmd_coord - Command initiator for coord subcommand.
- * @argc: number of arguments;
- * @argv: arguments array;
- *
- * This command provides coordinate conversions:
- *   - to-ecef <lat> <lon> <h>
- *   - to-geo <x> <y> <z>
- *
- * Examples:
- *   gnss-tool coord to-ecef 52.0 13.0 100.0
- *   gnss-tool coord to-geo 3834167.673 885187.355 5002882.147
- */
 int cmd_coord(int argc, char *argv[]) {
 	if (argc < 2) {
 		// EXIT FAILURE: not enough arguments
@@ -52,6 +38,8 @@ int cmd_coord(int argc, char *argv[]) {
 		};
 		struct geodesic result = to_geo(&input_xyz);
 		print_geodesic_coord(&result);
+	
+	// unknown command
 	} else {
 		fprintf(stderr, "Unkown command: %s\n", argv[1]);
 		print_coord_usage();
@@ -59,6 +47,7 @@ int cmd_coord(int argc, char *argv[]) {
 	}
 	return EXIT_SUCCESS;
 }
+
 
 void print_coord_usage() {
 	printf("Usage: gnss-tool coord <subcommands>\n");
@@ -68,11 +57,13 @@ void print_coord_usage() {
 	printf("  help                          displays this help.\n");
 }
 
+
 void print_geodesic_coord(const struct geodesic *geocoord) {
 	printf("[to_geo@coord] output: \n");
 	printf(" lat -> %f \n lon -> %f \n h -> %f \n",
 		geocoord->lat, geocoord->lon, geocoord->h);
 }
+
 
 void print_cartesian_coord(const struct cartesian *carcoord) {
 	printf("[to_ecef@coord] output:\n");
@@ -80,13 +71,11 @@ void print_cartesian_coord(const struct cartesian *carcoord) {
 		carcoord->x, carcoord->y, carcoord->z);
 };
 
+
 /* ----------------------------------------------------
- *  Geodesic Functions
+ * Geodesic Functions
  * --------------------------------------------------- */
 
-/*
- *
- * */
 struct cartesian to_ecef(const struct geodesic *geocoord) {
 	// Convert geocoord angles to rad
 	double lat_rad = geocoord->lat * M_PI / 180.0;
@@ -140,6 +129,7 @@ struct geodesic to_geo(const struct cartesian *cartcoord) {
 
 	return result;
 }
+
 /* ----------------------------------------------------
  *  TODO: memory management functions
  * --------------------------------------------------- */
