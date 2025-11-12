@@ -9,7 +9,7 @@
  * --------------------------------------------------- */
 
 /**
- * 
+ *
  * cmd_coord - Command initiator for coord subcommand.
  * @argc: number of arguments;
  * @argv: arguments array;
@@ -17,7 +17,7 @@
  * This command provides coordinate conversions:
  *   - to-ecef <lat> <lon> <h>
  *   - to-geo <x> <y> <z>
- * 
+ *
  * Examples:
  *   gnss-tool coord to-ecef 52.0 13.0 100.0
  *   gnss-tool coord to-geo 3834167.673 885187.355 5002882.147
@@ -40,8 +40,8 @@ int cmd_coord(int argc, char *argv[]) {
 		};
 		struct cartesian result = to_ecef(&input_geo);
 		print_cartesian_coord(&result);
-	
-	// from cartesian to geodetic 
+
+	// from cartesian to geodetic
 	} else if (!strcmp(argv[1], "to-geo")) {
 		printf("[coord] Converting ECEF to geodetic...\n");
 
@@ -70,12 +70,14 @@ void print_coord_usage() {
 
 void print_geodesic_coord(const struct geodesic *geocoord) {
 	printf("[to_geo@coord] output: \n");
-	printf(" lat -> %f \n lon -> %f \n h -> %f \n", geocoord->lat, geocoord->lon, geocoord->h);
+	printf(" lat -> %f \n lon -> %f \n h -> %f \n",
+		geocoord->lat, geocoord->lon, geocoord->h);
 }
 
 void print_cartesian_coord(const struct cartesian *carcoord) {
 	printf("[to_ecef@coord] output:\n");
-	printf(" x -> %f \n y -> %f \n z -> %f \n", carcoord->x, carcoord->y, carcoord->z);
+	printf(" x -> %f \n y -> %f \n z -> %f \n",
+		carcoord->x, carcoord->y, carcoord->z);
 };
 
 /* ----------------------------------------------------
@@ -83,14 +85,14 @@ void print_cartesian_coord(const struct cartesian *carcoord) {
  * --------------------------------------------------- */
 
 /*
- * 
+ *
  * */
 struct cartesian to_ecef(const struct geodesic *geocoord) {
 	// Convert geocoord angles to rad
 	double lat_rad = geocoord->lat * M_PI / 180.0;
 	double lon_rad = geocoord->lon * M_PI / 180.0;
 	double e_sq = (2 * WGS84_F) - pow(WGS84_F, 2);
-	
+
 	// Compute the radius of the curvature
 	double N = WGS84_A / sqrt(1.0 - (e_sq * pow(sin(lat_rad),2)));
 
@@ -99,10 +101,10 @@ struct cartesian to_ecef(const struct geodesic *geocoord) {
 	double y = (N + geocoord->h) * cos(lat_rad) * sin(lon_rad);
 	double z = (((1 - e_sq) * N) + geocoord->h) * sin(lat_rad);
 
-        // Struct result
+  // Struct result
 	struct cartesian result = {
-		.x = x, 
-		.y = y, 
+		.x = x,
+		.y = y,
 		.z = z
 	};
 
@@ -115,26 +117,29 @@ struct geodesic to_geo(const struct cartesian *cartcoord) {
 	double lon = atan(cartcoord->y/cartcoord->x);
 
 	// initial latitude
-	double p = sqrt(pow(cartcoord->x, 2) + pow(cartcoord->y, 2));
-	double e_sq = (2 * WGS84_F) - pow(WGS84_F, 2);
-	double lat = atan((cartcoord->z/p)/(1 - e_sq));
-	double h = cartcoord->z;
-	
-	// iteration to refine latitude (for loop against tolerance and max tries)
-	// (The iterations are repeated until the change between two successive
-        // values of φ(i) is smaller than the precision required.)
+	double p = sqrt(pow(cartcoord->x, 2.0) + pow(cartcoord->y, 2.0));
+	double e_sq = (2.0 * WGS84_F) - pow(WGS84_F, 2.0);
+	double lat = atan2((cartcoord->z/p)/(1 - e_sq));
 
-	
-        struct geodesic result = {
+	double prev_lat = lat;
+	double N, h;
+
+	do {
+		prev_lat = lat;
+		N = WGS84_A / sqrt(1 - e_sq * pow(sin(lat),2.0));
+		h = (p / cos(lat)) - N;
+		lat = atan2((cartcoord->z)/p)/(1 - (N / N + h) * e_sq);
+		iter++;
+	} while (fabs(lat - prev_lat) > 1e-6 && iter < 100);
+
+  struct geodesic result = {
 		.lat = lat,
 		.lon = lon,
 		.h = h
 	}
-        
-	// struct result
+
 	return result;
 }
 /* ----------------------------------------------------
  *  TODO: memory management functions
  * --------------------------------------------------- */
-
