@@ -103,7 +103,7 @@ struct cartesian to_ecef(const struct geodesic *geocoord) {
 
 struct geodesic to_geo(const struct cartesian *cartcoord) {
     // longitude
-    double lon = atan(cartcoord->y/cartcoord->x);
+    double lon = atan2(cartcoord->y,cartcoord->x);
     
     // initial latitude
     double p = sqrt(pow(cartcoord->x, 2.0) + pow(cartcoord->y, 2.0));
@@ -120,7 +120,7 @@ struct geodesic to_geo(const struct cartesian *cartcoord) {
         h = (p / cos(prev_lat)) - N;
         lat = atan2(cartcoord->z,(1.0 - e_sq * (N / (N + h))) * p);
         iter++;
-    } while (fabs(lat - prev_lat) > 1e-12);    
+    } while (fabs(lat - prev_lat) > 1e-12 && iter < 1000);
 
     lon *= 180.0 / M_PI;
     lat *= 180.0 / M_PI;
