@@ -133,7 +133,3 @@ struct geodesic to_geo(const struct cartesian *cartcoord) {
 
     return result;
 }
-
-/* ----------------------------------------------------
- *  TODO: memory management functions
- * --------------------------------------------------- */
