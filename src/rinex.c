@@ -3,9 +3,8 @@
 #include <string.h>
 #include "rinex.h"
 
-/*
- * TODO: cmd_rinex documentation
- * */
+/* command line functions ................................................... */
+
 int cmd_rinex(int argc, char *argv[]){
 	if (argc < 2) {
 		print_rinex_usage();
@@ -15,6 +14,13 @@ int cmd_rinex(int argc, char *argv[]){
 	return EXIT_SUCCESS;
 }
 
+
 void print_rinex_usage(){
 	printf("Usage: gnss-tool rinex <subcommands>");
+}
+
+/* rinex observation parser functions ....................................... */
+
+int read_obs_header(FILE *fp, rinex_obs_header *hdr){
+    
 }
