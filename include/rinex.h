@@ -1,11 +1,14 @@
 #ifndef RINEX_H
 #define RINEX_H
 
+
 /* constants -----------------------------------------------------------------*/
+
 
 #define MAX_OBS_TYPES 16	/* max # of obs values per sat (C1, L1, etc) */
 #define MAX_SATS      64	/* max # of satellites in a single obs epoch */
-#define MAX_EPH       64        /* max # of ephemeris records stored */
+#define MAX_EPH       64    /* max # of ephemeris records stored */
+
 
 /* type definitions ----------------------------------------------------------*/
 
@@ -58,9 +61,31 @@ typedef struct {
 
 /* function prototypes -------------------------------------------------------*/
 
+/**
+ * TODO: cmd_rinex documentation
+ */
 int cmd_rinex(int argc, char *argv[]);
+
+/**
+ * TODO: print_rinex_usage documentation
+ */
 void print_rinex_usage();
 
-FILE *read_rinex(char *path);
+/**
+ * @brief Reads and parses RINEX observation headers.
+ * 
+ * @param[in] fp Pointer to the observation RINEX file.
+ * 
+ * @param[in] hdr Pointer to the header variable that will hold
+ *                the parsed header values from the file.
+ * 
+ * @return None. This function will update the hdr variable with
+ *               header values from fp RINEX file.
+ */
+int read_obs_header(FILE *fp, rinex_obs_header *hdr);
 
+/**
+ *@brief TODO: document read_obs_epoch
+ */
+int read_obs_epoch(FILE *fp, const rinex_obs_header *hdr, obs_epoch_t *epoch);
 #endif
